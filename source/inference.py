@@ -7,7 +7,10 @@ import pandas as pd
 import torch
 import transformers
 from datasets import Dataset
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 from peft import AutoPeftModelForCausalLM, LoraConfig
+from rag import init_vectorstore, retrieve_query
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from trl import DataCollatorForCompletionOnlyLM, SFTConfig, SFTTrainer
@@ -142,11 +145,22 @@ def inference():
 
     model.eval()
     with torch.inference_mode():
+        embeddings_model = HuggingFaceEmbeddings(
+            model_name="jhgan/ko-sbert-nli",
+            model_kwargs={"device": "cuda"},
+            encode_kwargs={"normalize_embeddings": True},
+        )
+        if os.path.exists("./db/vectorstore"):
+            print("Loading vectorstore")
+            vectorstore = FAISS.load_local("./db/vectorstore", embeddings_model, allow_dangerous_deserialization=True)
+        else:
+            vectorstore = init_vectorstore()
         for data in tqdm(test_dataset):
             _id = data["id"]
             messages = data["messages"]
             len_choices = data["len_choices"]
-
+            doc = retrieve_query(messages[1]["content"], vectorstore)
+            messages[1]["content"] = doc[0].page_content + messages[1]["content"]
             outputs = model(
                 tokenizer.apply_chat_template(
                     messages,
@@ -167,7 +181,7 @@ def inference():
             predict_value = pred_choices_map[np.argmax(probs, axis=-1)]
             infer_results.append({"id": _id, "answer": predict_value})
 
-    pd.DataFrame(infer_results).to_csv("output.csv", index=False)
+    pd.DataFrame(infer_results).to_csv("output_rag.csv", index=False)
 
 
 if __name__ == "__main__":
