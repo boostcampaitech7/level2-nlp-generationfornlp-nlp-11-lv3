@@ -1,21 +1,19 @@
+import os
+from ast import literal_eval
+
+import evaluate
+import numpy as np
+import pandas as pd
 import torch
 import transformers
-from ast import literal_eval
-from trl import SFTTrainer, DataCollatorForCompletionOnlyLM, SFTConfig
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from datasets import Dataset
-import pandas as pd
-import numpy as np
-import evaluate
-from tqdm import tqdm
 from peft import AutoPeftModelForCausalLM, LoraConfig
-import os
-
-
+from tqdm import tqdm
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from trl import DataCollatorForCompletionOnlyLM, SFTConfig, SFTTrainer
 from utils import set_seed
 
-
-set_seed(42) # magic number :)
+set_seed(42)  # magic number :)
 
 
 PROMPT_NO_QUESTION_PLUS = """지문:
@@ -59,8 +57,7 @@ def inference():
         output_path = "./outputs"
         file_list = os.listdir(output_path)
 
-
-        checkpoint_path = os.path.join(output_path,file_list[-1])
+        checkpoint_path = os.path.join(output_path, file_list[-1])
 
         model = AutoPeftModelForCausalLM.from_pretrained(
             checkpoint_path,
@@ -84,25 +81,25 @@ def inference():
             trust_remote_code=True,
         )
 
-    test_df = pd.read_csv('../data/test.csv')
+    test_df = pd.read_csv("../data/test.csv")
 
     # Flatten the JSON dataset
     records = []
     for _, row in test_df.iterrows():
-        problems = literal_eval(row['problems'])
+        problems = literal_eval(row["problems"])
         record = {
-            'id': row['id'],
-            'paragraph': row['paragraph'],
-            'question': problems['question'],
-            'choices': problems['choices'],
-            'answer': problems.get('answer', None),
-            "question_plus": problems.get('question_plus', None),
+            "id": row["id"],
+            "paragraph": row["paragraph"],
+            "question": problems["question"],
+            "choices": problems["choices"],
+            "answer": problems.get("answer", None),
+            "question_plus": problems.get("question_plus", None),
         }
         # Include 'question_plus' if it exists
-        if 'question_plus' in problems:
-            record['question_plus'] = problems['question_plus']
+        if "question_plus" in problems:
+            record["question_plus"] = problems["question_plus"]
         records.append(record)
-            
+
     # Convert to DataFrame
     test_df = pd.DataFrame(records)
 
@@ -110,7 +107,7 @@ def inference():
     for i, row in test_df.iterrows():
         choices_string = "\n".join([f"{idx + 1} - {choice}" for idx, choice in enumerate(row["choices"])])
         len_choices = len(row["choices"])
-        
+
         # <보기>가 있을 때
         if row["question_plus"]:
             user_message = PROMPT_QUESTION_PLUS.format(
@@ -139,7 +136,6 @@ def inference():
             }
         )
 
-
     infer_results = []
 
     pred_choices_map = {0: "1", 1: "2", 2: "3", 3: "4", 4: "5"}
@@ -165,18 +161,14 @@ def inference():
             target_logit_list = [logits[tokenizer.vocab[str(i + 1)]] for i in range(len_choices)]
 
             probs = (
-                torch.nn.functional.softmax(
-                    torch.tensor(target_logit_list, dtype=torch.float32)
-                )
-                .detach()
-                .cpu()
-                .numpy()
+                torch.nn.functional.softmax(torch.tensor(target_logit_list, dtype=torch.float32)).detach().cpu().numpy()
             )
 
             predict_value = pred_choices_map[np.argmax(probs, axis=-1)]
             infer_results.append({"id": _id, "answer": predict_value})
 
     pd.DataFrame(infer_results).to_csv("output.csv", index=False)
+
 
 if __name__ == "__main__":
     inference()
