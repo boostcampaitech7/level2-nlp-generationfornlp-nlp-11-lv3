@@ -92,10 +92,20 @@ def retrieve_query(query: str, vectorstore=None):
     return ret_docs
 
 
-if __name__ == "__main__":
-    # id - 100
-    query = "○장수왕은 남 진 정책의 일환으로 수도를 이곳으로 천도 하였다. ○묘청은 이곳으로 수도를 옮길 것을 주장하였다.'question': '밑줄 친 ‘이곳’에 대한 설명으로 옳은 것은?"
-    ret_docs = retrieve_query(query)
+if __name__ == '__main__':
+    embeddings_model = HuggingFaceEmbeddings(
+            model_name='jhgan/ko-sbert-nli',
+            model_kwargs={'device':'cuda'},
+            encode_kwargs={'normalize_embeddings':True},
+        )
+    if os.path.exists('./db/vectorstore'):
+        print("Loading vectorstore")
+        vectorstore = FAISS.load_local('./db/vectorstore', embeddings_model,allow_dangerous_deserialization=True)
+    else:
+        vectorstore = init_vectorstore()
+    #id - 100
+    query = "○불교를 수용하였다. ○태학을 설립하였다.'question': '다음 정책을 시행한 국왕의 재위 기간에 있었던 사실로 옳은 것은?"
+    ret_docs = retrieve_query(query, vectorstore)
     print(ret_docs)
-    print("=" * 50)
+    print("="*50)
     print(ret_docs[0].page_content)
