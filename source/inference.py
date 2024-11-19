@@ -2,6 +2,7 @@ import os
 from ast import literal_eval
 
 import evaluate
+import hydra
 import numpy as np
 import pandas as pd
 import torch
@@ -9,15 +10,13 @@ import transformers
 from datasets import Dataset
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
+from omegaconf import DictConfig
 from peft import AutoPeftModelForCausalLM, LoraConfig
 from rag import init_vectorstore, retrieve_query
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from trl import DataCollatorForCompletionOnlyLM, SFTConfig, SFTTrainer
 from utils import set_seed
-
-set_seed(42)  # magic number :)
-
 
 PROMPT_NO_QUESTION_PLUS = """지문:
 {paragraph}
@@ -30,7 +29,6 @@ PROMPT_NO_QUESTION_PLUS = """지문:
 
 먼저 문제를 이해하고, 문제 해결을 위하여 계획을 세워보세요.
 그 다음 단계별로 생각하여 정답을 고르세요.
-이 문제에 제 인생이 달렸습니다. 저를 위해 꼭 정답을 말해주세요.
 1, 2, 3, 4, 5 중에 하나를 정답으로 고르세요.
 정답:"""
 
@@ -48,16 +46,21 @@ PROMPT_QUESTION_PLUS = """지문:
 
 먼저 문제를 이해하고, 문제 해결을 위하여 계획을 세워보세요.
 그 다음 단계별로 생각하여 정답을 고르세요.
-이 문제에 제 인생이 달렸습니다. 저를 위해 꼭 정답을 말해주세요.
 1, 2, 3, 4, 5 중에 하나를 정답으로 고르세요.
 정답:"""
 
 
-def inference():
+def logit_inference(cfg: DictConfig):
 
-    from_finetuned = False
+    model_id = cfg.model
+    seed = cfg.seed
+    data_path = cfg.data_path
+    output_path = cfg.output_path
+    from_finetuned = cfg.inference.from_fine_tuning
+
+    set_seed(seed)  # magic number :)
+
     if from_finetuned:
-        output_path = "./outputs"
         file_list = os.listdir(output_path)
 
         checkpoint_path = os.path.join(output_path, file_list[-1])
@@ -73,7 +76,6 @@ def inference():
             trust_remote_code=True,
         )
     else:
-        model_id = "yanolja/EEVE-Korean-Instruct-10.8B-v1.0"
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
             trust_remote_code=True,
@@ -83,8 +85,8 @@ def inference():
             model_id,
             trust_remote_code=True,
         )
-
-    test_df = pd.read_csv("../data/test.csv")
+    data_path = os.path.join(data_path, "test.csv")
+    test_df = pd.read_csv(data_path)
 
     # Flatten the JSON dataset
     records = []
@@ -131,7 +133,10 @@ def inference():
             {
                 "id": row["id"],
                 "messages": [
-                    {"role": "system", "content": "지문을 읽고 질문의 답을 구하세요."},
+                    {
+                        "role": "system",
+                        "content": "당신은 학생에게 문제를 풀어주는 선생님입니다. 질문에 대한 답을 구하세요.",
+                    },
                     {"role": "user", "content": user_message},
                 ],
                 "label": row["answer"],
@@ -155,12 +160,14 @@ def inference():
             vectorstore = FAISS.load_local("./db/vectorstore", embeddings_model, allow_dangerous_deserialization=True)
         else:
             vectorstore = init_vectorstore()
+        batch = 0
         for data in tqdm(test_dataset):
+            batch += 1
             _id = data["id"]
             messages = data["messages"]
             len_choices = data["len_choices"]
-            doc = retrieve_query(messages[1]["content"], vectorstore)
-            messages[1]["content"] = doc[0].page_content + messages[1]["content"]
+            # doc = retrieve_query(messages[1]["content"], vectorstore)
+            # messages[1]["content"] = doc[0].page_content + messages[1]["content"]
             outputs = model(
                 tokenizer.apply_chat_template(
                     messages,
@@ -180,9 +187,159 @@ def inference():
 
             predict_value = pred_choices_map[np.argmax(probs, axis=-1)]
             infer_results.append({"id": _id, "answer": predict_value})
+            if batch == 1050:
+                pd.DataFrame(infer_results).to_csv("output_train.csv", index=False)
+                batch = 0
+    pd.DataFrame(infer_results).to_csv("output_train.csv", index=False)
 
-    pd.DataFrame(infer_results).to_csv("output_rag.csv", index=False)
+
+def generate_inference(cfg: DictConfig):
+
+    model_id = "Qwen/Qwen2.5-Coder-32B-Instruct-GPTQ-Int4"
+
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id,
+        torch_dtype=torch.float16,
+        trust_remote_code=True,
+    ).to("cuda")
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_id,
+        trust_remote_code=True,
+    )
+
+    dataset = pd.read_csv("../data/test.csv")
+
+    # Flatten the JSON dataset
+    records = []
+    for _, row in dataset.iterrows():
+        problems = literal_eval(row["problems"])
+        record = {
+            "id": row["id"],
+            "paragraph": row["paragraph"],
+            "question": problems["question"],
+            "choices": problems["choices"],
+            "answer": problems.get("answer", None),
+            "question_plus": problems.get("question_plus", None),
+        }
+        # Include 'question_plus' if it exists
+        if "question_plus" in problems:
+            record["question_plus"] = problems["question_plus"]
+        records.append(record)
+
+    # Convert to DataFrame
+    df = pd.DataFrame(records)
+    df["question_plus"] = df["question_plus"].fillna("")
+    df["full_question"] = df.apply(
+        lambda x: x["question"] + " " + x["question_plus"] if x["question_plus"] else x["question"], axis=1
+    )
+
+    # Calculate the length of each question
+    df["question_length"] = df["full_question"].apply(len)
+
+    dataset = Dataset.from_pandas(df)
+    processed_dataset = []
+    for i in range(len(dataset)):
+        choices_string = "\n".join([f"{idx + 1} - {choice}" for idx, choice in enumerate(dataset[i]["choices"])])
+        len_choices = len(dataset[i]["choices"])
+        # <보기>가 있을 때
+        if dataset[i]["question_plus"]:
+            user_message = PROMPT_QUESTION_PLUS.format(
+                paragraph=dataset[i]["paragraph"],
+                question=dataset[i]["question"],
+                question_plus=dataset[i]["question_plus"],
+                choices=choices_string,
+            )
+        # <보기>가 없을 때
+        else:
+            user_message = PROMPT_NO_QUESTION_PLUS.format(
+                paragraph=dataset[i]["paragraph"],
+                question=dataset[i]["question"],
+                choices=choices_string,
+            )
+
+        # chat message 형식으로 변환
+        processed_dataset.append(
+            {
+                "id": dataset[i]["id"],
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "당신은 학생에게 문제를 풀어주는 선생님입니다. 질문에 대한 답을 구하세요.",
+                    },
+                    {"role": "user", "content": user_message},
+                ],
+                "label": dataset[i]["answer"],
+                "len_choices": len_choices,
+            }
+        )
+    processed_dataset = Dataset.from_pandas(pd.DataFrame(processed_dataset))
+
+    def formatting_prompts_func(example):
+        output_texts = []
+        for i in range(len(example["messages"])):
+            output_texts.append(
+                tokenizer.apply_chat_template(
+                    example["messages"][i],
+                    tokenize=False,
+                )
+            )
+        return output_texts
+
+    def tokenize(element):
+        outputs = tokenizer(
+            formatting_prompts_func(element),
+            truncation=False,
+            padding=False,
+            return_overflowing_tokens=False,
+            return_length=False,
+        )
+        return {
+            "input_ids": outputs["input_ids"],
+            "attention_mask": outputs["attention_mask"],
+        }
+
+    # 데이터 토큰화
+    tokenized_dataset = processed_dataset.map(
+        tokenize,
+        remove_columns=list(processed_dataset.features),
+        batched=True,
+        num_proc=4,
+        load_from_cache_file=True,
+        desc="Tokenizing",
+    )
+
+    infer_results = []
+
+    pred_choices_map = {0: "1", 1: "2", 2: "3", 3: "4", 4: "5"}
+    model.eval()
+    with torch.inference_mode():
+        for i, data in enumerate(tqdm(tokenized_dataset, desc="Inferencing")):
+            id = processed_dataset[i]["id"]
+            text = tokenizer.decode(data["input_ids"], skip_special_tokens=False)
+            input_text = text.split("<end_of_turn>")[0]
+
+            inputs = tokenizer(input_text, return_tensors="pt", padding=True, truncation=True).to("cuda")
+            outputs = model.generate(
+                **inputs,
+                max_new_tokens=10,
+                pad_token_id=tokenizer.pad_token_id,
+            )
+            generated_text = tokenizer.batch_decode(outputs[:, inputs.input_ids.shape[1] :], skip_special_tokens=True)[
+                0
+            ]
+            generated_text = generated_text.strip()
+            infer_results.append({"id": id, "answer": generated_text})
+
+
+@hydra.main(config_path="./configs", config_name="configs")
+def main(cfg: DictConfig):
+    if cfg.inference.inference_mode == "logit":
+        print("logit inference")
+        logit_inference(cfg)
+    elif cfg.inference.inference_mode == "generate":
+        print("generate inference")
+        generate_inference(cfg)
 
 
 if __name__ == "__main__":
-    inference()
+    main()
