@@ -92,20 +92,20 @@ def retrieve_query(query: str, vectorstore=None):
     return ret_docs
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     embeddings_model = HuggingFaceEmbeddings(
-            model_name='jhgan/ko-sbert-nli',
-            model_kwargs={'device':'cuda'},
-            encode_kwargs={'normalize_embeddings':True},
-        )
-    if os.path.exists('./db/vectorstore'):
+        model_name="jhgan/ko-sbert-nli",
+        model_kwargs={"device": "cuda"},
+        encode_kwargs={"normalize_embeddings": True},
+    )
+    if os.path.exists("./db/vectorstore"):
         print("Loading vectorstore")
-        vectorstore = FAISS.load_local('./db/vectorstore', embeddings_model,allow_dangerous_deserialization=True)
+        vectorstore = FAISS.load_local("./db/vectorstore", embeddings_model, allow_dangerous_deserialization=True)
     else:
         vectorstore = init_vectorstore()
-    #id - 100
+    # id - 100
     query = "○불교를 수용하였다. ○태학을 설립하였다.'question': '다음 정책을 시행한 국왕의 재위 기간에 있었던 사실로 옳은 것은?"
     ret_docs = retrieve_query(query, vectorstore)
     print(ret_docs)
-    print("="*50)
+    print("=" * 50)
     print(ret_docs[0].page_content)
