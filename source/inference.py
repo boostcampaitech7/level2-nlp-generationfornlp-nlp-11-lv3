@@ -196,8 +196,9 @@ def logit_inference(cfg: DictConfig):
             predict_value = pred_choices_map[np.argmax(probs, axis=-1)]
             infer_results.append({"id": _id, "answer": predict_value})
     model_name = model_id.replace("/", "_")
-    output = f"code/output_train_{model_name}.csv"
-    output_path = os.path.join(home_path, output)
+    output = f"output_train_{model_name}.csv"
+    output_path = os.path.join(home_path, output_path)
+    output_path = os.path.join(output_path, output)
     pd.DataFrame(infer_results).to_csv(output_path, index=False)
 
 
