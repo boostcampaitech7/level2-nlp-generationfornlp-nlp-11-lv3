@@ -113,14 +113,14 @@ def logit_inference(cfg: DictConfig):
         model_kwargs={"device": "cuda"},
         encode_kwargs={"normalize_embeddings": True},
     )
-    vectorstore_path = "code/db/vectorstore"
+    vectorstore_path = "/db/vectorstore"
     vectorstore_path = os.path.join(home_path, vectorstore_path)
 
     if os.path.exists(vectorstore_path):
         print("Loading vectorstore")
         vectorstore = FAISS.load_local(vectorstore_path, embeddings_model, allow_dangerous_deserialization=True)
     else:
-        vectorstore = init_vectorstore()
+        vectorstore = init_vectorstore(vectorstore_path)
 
     # Convert to DataFrame
     test_df = pd.DataFrame(records)

@@ -13,13 +13,14 @@ from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
-def init_vectorstore():
+def init_vectorstore(vectorstore_path):
     # Load the data
-    if os.path.isfile("./db/vectorstore"):
-        with open("./db/vectorstore", "rb") as f:
+    if os.path.isfile(vectorstore_path):
+        with open(vectorstore_path, "rb") as f:
             return FAISS.load_local(f)
     else:
-        loader = TextLoader("../data/processed_wiki_ko.txt")
+        wiki_path = os.path.join(os.path.dirname(__file__), "../data/processed_wiki_ko.txt")
+        loader = TextLoader(wiki_path)
         data = loader.load()
 
         # Split the data
@@ -34,12 +35,13 @@ def init_vectorstore():
         vectorstore = FAISS.from_documents(
             documents=splits, embedding=embeddings_model, distance_strategy=DistanceStrategy.COSINE
         )
-        vectorstore.save_local("./db/vectorstore")
+        vectorstore.save_local(vectorstore_path)
         return vectorstore
 
 
 def init_bm25_retriever():
-    loader = TextLoader("../data/processed_wiki_ko.txt")
+    wiki_path = os.path.join(os.path.dirname(__file__), "../data/processed_wiki_ko.txt")
+    loader = TextLoader(wiki_path)
     data = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=150, chunk_overlap=50, length_function=len)
     splits = text_splitter.split_documents(data)
@@ -53,40 +55,7 @@ def init_bm25_retriever():
 
 def retrieve_query(query: str, vectorstore=None):
 
-    # if os.path.isfile('./db/bm25_retriever/bm25.bin'):
-    #     print("Loading bm25_retriever")
-    #     with open('./db/bm25_retriever/bm25.bin', 'rb') as f:
-    #         bm25_retriever = pickle.load(f)
-    # else:
-    #     bm25_retriever = init_bm25_retriever()
-    store = InMemoryStore()
-    # child_splitter = RecursiveCharacterTextSplitter(
-    #     chunk_size=50,
-    #     chunk_overlap=50
-    # )
-
-    # # Parent splitter 설정 (반환용 더 큰 청크)
-    # parent_splitter = RecursiveCharacterTextSplitter(
-    #     chunk_size=500,  # 원하는 반환 길이
-    #     chunk_overlap=50
-    # )
-
-    # parent_faiss = ParentDocumentRetriever(
-    #     vectorstore=vectorstore,  # 기존 FAISS Retriever
-    #     docstore=store,
-    #     child_splitter=child_splitter,
-    #     parent_splitter=parent_splitter,
-    # )
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-    # ensembel_retriever = EnsembleRetriever(
-    #     retrievers = [bm25_retriever, parent_faiss], weights=[0.5, 0.5]
-    # )
-
-    # docs = ensembel_retriever.invoke(query)
-    # docs = parent_faiss.invoke(query)
-    # ret_docs = []
-    # for doc in docs:
-    #     ret_docs.append(doc.page_content)
     ret_docs = retriever.invoke(query)
 
     return ret_docs
@@ -98,7 +67,8 @@ if __name__ == "__main__":
         model_kwargs={"device": "cuda"},
         encode_kwargs={"normalize_embeddings": True},
     )
-    if os.path.exists("./db/vectorstore"):
+    db_path = os.path.join(os.path.dirname(__file__),"../db/vectorstore")
+    if os.path.exists(db_path):
         print("Loading vectorstore")
         vectorstore = FAISS.load_local("./db/vectorstore", embeddings_model, allow_dangerous_deserialization=True)
     else:
