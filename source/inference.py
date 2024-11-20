@@ -77,6 +77,7 @@ def logit_inference(cfg: DictConfig):
             checkpoint_path,
             trust_remote_code=True,
         )
+        
     else:
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
@@ -108,19 +109,19 @@ def logit_inference(cfg: DictConfig):
             record["question_plus"] = problems["question_plus"]
         records.append(record)
 
-    embeddings_model = HuggingFaceEmbeddings(
-        model_name="jhgan/ko-sbert-nli",
-        model_kwargs={"device": "cuda"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
-    vectorstore_path = "/db/vectorstore"
-    vectorstore_path = os.path.join(home_path, vectorstore_path)
+    # embeddings_model = HuggingFaceEmbeddings(
+    #     model_name="jhgan/ko-sbert-nli",
+    #     model_kwargs={"device": "cuda"},
+    #     encode_kwargs={"normalize_embeddings": True},
+    # )
+    # vectorstore_path = "/db/vectorstore"
+    # vectorstore_path = os.path.join(home_path, vectorstore_path)
 
-    if os.path.exists(vectorstore_path):
-        print("Loading vectorstore")
-        vectorstore = FAISS.load_local(vectorstore_path, embeddings_model, allow_dangerous_deserialization=True)
-    else:
-        vectorstore = init_vectorstore(vectorstore_path)
+    # if os.path.exists(vectorstore_path):
+    #     print("Loading vectorstore")
+    #     vectorstore = FAISS.load_local(vectorstore_path, embeddings_model, allow_dangerous_deserialization=True)
+    # else:
+    #     vectorstore = init_vectorstore(vectorstore_path)
 
     # Convert to DataFrame
     test_df = pd.DataFrame(records)
@@ -129,10 +130,10 @@ def logit_inference(cfg: DictConfig):
     for i, row in tqdm(test_df.iterrows(), desc="Processing data and retrieving documents"):
         choices_string = "\n".join([f"{idx + 1} - {choice}" for idx, choice in enumerate(row["choices"])])
         len_choices = len(row["choices"])
-        total_text = row["paragraph"] + row["question"]
-        if len(total_text) < 300:
-            doc = retrieve_query(total_text, vectorstore)
-            row["paragraph"] = row["paragraph"] + " 힌트: " + doc[0].page_content
+        # total_text = row["paragraph"] + row["question"]
+        # if len(total_text) < 300:
+        #     doc = retrieve_query(total_text, vectorstore)
+        #     row["paragraph"] = row["paragraph"] + " 힌트: " + doc[0].page_content
         # <보기>가 있을 때
         if row["question_plus"]:
             user_message = PROMPT_QUESTION_PLUS.format(
@@ -350,7 +351,7 @@ def generate_inference(cfg: DictConfig):
     pd.DataFrame(infer_results).to_csv(output_path, index=False)
 
 
-@hydra.main(config_path="./configs", config_name="configs")
+@hydra.main(config_path="../configs", config_name="configs")
 def main(cfg: DictConfig):
     if cfg.inference.inference_mode == "logit":
         print("logit inference")
