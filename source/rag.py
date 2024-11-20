@@ -70,7 +70,7 @@ if __name__ == "__main__":
     db_path = os.path.join(os.path.dirname(__file__),"../db/vectorstore")
     if os.path.exists(db_path):
         print("Loading vectorstore")
-        vectorstore = FAISS.load_local("./db/vectorstore", embeddings_model, allow_dangerous_deserialization=True)
+        vectorstore = FAISS.load_local(db_path, embeddings_model, allow_dangerous_deserialization=True)
     else:
         vectorstore = init_vectorstore()
     # id - 100
