@@ -61,7 +61,7 @@ def logit_inference(cfg: DictConfig):
     from_finetuned = cfg.inference.from_fine_tuning
 
     set_seed(seed)  # magic number :)
-
+    output_path = os.path.join(os.path.dirname(__file__), output_path)
     if from_finetuned:
         file_list = os.listdir(output_path)
 
@@ -88,7 +88,7 @@ def logit_inference(cfg: DictConfig):
             model_id,
             trust_remote_code=True,
         )
-    data_path = os.path.join(home_path, data_path)
+    
     data_path = os.path.join(data_path, "test.csv")
     test_df = pd.read_csv(data_path)
 
@@ -115,7 +115,7 @@ def logit_inference(cfg: DictConfig):
     #     encode_kwargs={"normalize_embeddings": True},
     # )
     # vectorstore_path = "/db/vectorstore"
-    # vectorstore_path = os.path.join(home_path, vectorstore_path)
+    # vectorstore_path = os.path.join(os.path.dirname(__file__), vectorstore_path)
 
     # if os.path.exists(vectorstore_path):
     #     print("Loading vectorstore")
@@ -210,6 +210,7 @@ def generate_inference(cfg: DictConfig):
     data_path = cfg.data_path
     output_path = cfg.output_path
     from_finetuned = cfg.inference.from_fine_tuning
+    output_path = os.path.join(os.path.dirname(__file__), output_path)
 
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
@@ -221,7 +222,6 @@ def generate_inference(cfg: DictConfig):
         trust_remote_code=True,
     )
 
-    data_path = os.path.join(home_path, data_path)
     data_path = os.path.join(data_path, "test.csv")
     dataset = pd.read_csv(data_path)
 
@@ -346,8 +346,8 @@ def generate_inference(cfg: DictConfig):
             generated_text = generated_text.strip()
             infer_results.append({"id": id, "answer": generated_text})
     model_name = model_id.replace("/", "_")
-    output = f"code/output_train_{model_name}.csv"
-    output_path = os.path.join(home_path, output)
+    output = f"output/output_train_{model_name}.csv"
+    output_path = os.path.join(os.path.dirname(__file__), output)
     pd.DataFrame(infer_results).to_csv(output_path, index=False)
 
 
