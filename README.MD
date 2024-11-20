@@ -17,6 +17,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
 │   └── vectorstore
 ├── source                
 │   ├── inference.py
+│   ├── fine_tuning.py
 │   ├── rag.py
 │   └── utils.py
 │        
