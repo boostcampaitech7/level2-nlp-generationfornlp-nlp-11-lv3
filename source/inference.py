@@ -58,14 +58,17 @@ def logit_inference(cfg: DictConfig):
     seed = cfg.seed
     data_path = cfg.data_path
     output_path = cfg.output_path
+    model_path = cfg.model_path
     from_finetuned = cfg.inference.from_fine_tuning
 
     set_seed(seed)  # magic number :)
+    model_path = os.path.join(os.path.dirname(__file__), model_path)
     output_path = os.path.join(os.path.dirname(__file__), output_path)
+    data_path = os.path.join(os.path.dirname(__file__), data_path)
     if from_finetuned:
         file_list = os.listdir(output_path)
 
-        checkpoint_path = os.path.join(output_path, file_list[-1])
+        checkpoint_path = os.path.join(model_path, file_list[-1])
 
         model = AutoPeftModelForCausalLM.from_pretrained(
             checkpoint_path,
@@ -77,7 +80,7 @@ def logit_inference(cfg: DictConfig):
             checkpoint_path,
             trust_remote_code=True,
         )
-        
+
     else:
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
@@ -88,7 +91,7 @@ def logit_inference(cfg: DictConfig):
             model_id,
             trust_remote_code=True,
         )
-    
+
     data_path = os.path.join(data_path, "test.csv")
     test_df = pd.read_csv(data_path)
 
@@ -198,7 +201,6 @@ def logit_inference(cfg: DictConfig):
             infer_results.append({"id": _id, "answer": predict_value})
     model_name = model_id.replace("/", "_")
     output = f"output_train_{model_name}.csv"
-    output_path = os.path.join(home_path, output_path)
     output_path = os.path.join(output_path, output)
     pd.DataFrame(infer_results).to_csv(output_path, index=False)
 
@@ -210,8 +212,10 @@ def generate_inference(cfg: DictConfig):
     data_path = cfg.data_path
     output_path = cfg.output_path
     from_finetuned = cfg.inference.from_fine_tuning
-    output_path = os.path.join(os.path.dirname(__file__), output_path)
 
+    set_seed(seed)  # magic number :)
+    output_path = os.path.join(os.path.dirname(__file__), output_path)
+    data_path = os.path.join(os.path.dirname(__file__), data_path)
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         torch_dtype=torch.float16,
@@ -346,8 +350,8 @@ def generate_inference(cfg: DictConfig):
             generated_text = generated_text.strip()
             infer_results.append({"id": id, "answer": generated_text})
     model_name = model_id.replace("/", "_")
-    output = f"output/output_train_{model_name}.csv"
-    output_path = os.path.join(os.path.dirname(__file__), output)
+    output = f"output_train_{model_name}.csv"
+    output_path = os.path.join(output_path, output)
     pd.DataFrame(infer_results).to_csv(output_path, index=False)
 
 
