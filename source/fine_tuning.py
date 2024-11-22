@@ -10,7 +10,9 @@ import numpy as np
 import pandas as pd
 import torch
 import transformers
+import wandb
 from datasets import Dataset
+from omegaconf import OmegaConf
 from peft import AutoPeftModelForCausalLM, LoraConfig
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm
@@ -55,7 +57,7 @@ def load_data(filepath: str):
     if not os.path.isfile(filepath):
         raise FileNotFoundError(f"Wrong path or No such file: {filepath}")
 
-    dataset = pd.read_csv("../data/train.csv")
+    dataset = pd.read_csv(filepath)
 
     # Flatten the JSON dataset
     records = []
@@ -128,10 +130,12 @@ def train(cfg):
 
     set_seed(cfg.seed)  # magic number :)
     model_id = cfg.model
-
+    data_path = cfg.data_path
+    output_path = cfg.output_path
+    wandb.init(project=f"fine-tuning-{model_id.replace('/', '-')}")
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
-        torch_dtype=torch.float16,
+        torch_dtype=torch.bfloat16,
         trust_remote_code=True,
     )
     tokenizer = AutoTokenizer.from_pretrained(
@@ -139,32 +143,22 @@ def train(cfg):
         trust_remote_code=True,
     )
 
-    tokenizer.chat_template = """
-    {% if messages[0]['role'] == 'system' %}
-        {% set system_message = messages[0]['content'] %}
-    {% endif %}
-    {% if system_message is defined %}
-        {{ system_message }}
-    {% endif %}
-    {% for message in messages %}
-        {% set content = message['content'] %}
-        {% if message['role'] == 'user' %}
-            {{ '<start_of_turn>user\n' + content + '<end_of_turn>\n<start_of_turn>model\n' }}
-        {% elif message['role'] == 'assistant' %}
-            {{ content + '<end_of_turn>\n' }}
-        {% endif %}
-    {% endfor %}
-    """
-    peft_config = LoraConfig(**cfg.fine_tuning.get("peft_config"))
-    # peft_config = LoraConfig(
-    #     r=6,
-    #     lora_alpha=8,
-    #     lora_dropout=0.05,
-    #     target_modules=['q_proj', 'k_proj'],
-    #     bias="none",
-    #     task_type="CAUSAL_LM",
-    # )
-    processed_dataset = load_data("../data/train.csv")
+    tokenizer.chat_template = "{% if messages[0]['role'] == 'system' %}{% set system_message = messages[0]['content'] %}{% endif %}{% if system_message is defined %}{{ system_message }}{% endif %}{% for message in messages %}{% set content = message['content'] %}{% if message['role'] == 'user' %}{{ '<start_of_turn>user\n' + content + '<end_of_turn>\n<start_of_turn>model\n' }}{% elif message['role'] == 'assistant' %}{{ content + '<end_of_turn>\n' }}{% endif %}{% endfor %}"
+    tokenizer.add_special_tokens({"bos_token": "<start_of_turn>", "eos_token": "<end_of_turn>", "pad_token": "<pad>"})
+    model.resize_token_embeddings(len(tokenizer))
+    # peft_config = OmegaConf.to_container(cfg.fine_tuning.get("peft_config"), resolve=True)
+    # peft_config = LoraConfig(peft_config)
+    peft_config = LoraConfig(
+        r=6,
+        lora_alpha=8,
+        lora_dropout=0.05,
+        target_modules=["q_proj", "k_proj"],
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
+
+    data_path = os.path.join(os.path.dirname(__file__), "../data/train.csv")
+    processed_dataset = load_data(data_path)
 
     def formatting_prompts_func(example):
         output_texts = []
@@ -200,13 +194,12 @@ def train(cfg):
         desc="Tokenizing",
     )
 
-    tokenized_dataset = tokenized_dataset.filter(lambda x: len(x["input_ids"]) <= 1720)
+    tokenized_dataset = tokenized_dataset.filter(lambda x: len(x["input_ids"]) <= 1024)
     tokenized_dataset = tokenized_dataset.train_test_split(test_size=0.1, seed=42)
 
     train_dataset = tokenized_dataset["train"]
     eval_dataset = tokenized_dataset["test"]
 
-    train_dataset_token_lengths = [len(train_dataset[i]["input_ids"]) for i in range(len(train_dataset))]
     response_template = "<start_of_turn>model"
     data_collator = DataCollatorForCompletionOnlyLM(
         response_template=response_template,
@@ -254,26 +247,26 @@ def train(cfg):
     tokenizer.special_tokens_map
 
     tokenizer.padding_side = "right"
-
-    sft_config = SFTConfig(**cfg.fine_tuning.get("sft_config"))
-    # sft_config = SFTConfig(
-    #     do_train=True,
-    #     do_eval=True,
-    #     lr_scheduler_type="cosine",
-    #     max_seq_length=1720,
-    #     output_dir="outputs_gemma",
-    #     per_device_train_batch_size=1,
-    #     per_device_eval_batch_size=1,
-    #     num_train_epochs=3,
-    #     learning_rate=2e-5,
-    #     weight_decay=0.01,
-    #     logging_steps=1,
-    #     save_strategy="epoch",
-    #     eval_strategy="epoch",
-    #     save_total_limit=2,
-    #     save_only_model=True,
-    #     report_to="none",
-    # )
+    # stf_config = OmegaConf.to_container(cfg.fine_tuning.get("sft_config"), resolve=True)
+    # sft_config = SFTConfig(stf_config)
+    sft_config = SFTConfig(
+        do_train=True,
+        do_eval=True,
+        lr_scheduler_type="cosine",
+        max_seq_length=1720,
+        output_dir="outputs_gemma",
+        per_device_train_batch_size=1,
+        per_device_eval_batch_size=1,
+        num_train_epochs=3,
+        learning_rate=2e-5,
+        weight_decay=0.01,
+        logging_steps=1,
+        save_strategy="epoch",
+        eval_strategy="epoch",
+        save_total_limit=2,
+        save_only_model=True,
+        report_to="none",
+    )
 
     trainer = SFTTrainer(
         model=model,
@@ -290,9 +283,9 @@ def train(cfg):
     trainer.train()
 
 
-@hydra.main(config_path="../config", config_name="config")
+@hydra.main(config_path="../configs", config_name="configs")
 def main(cfg):
-    train(cfg.fine_tuning)
+    train(cfg)
 
 
 if __name__ == "__main__":
