@@ -11,7 +11,7 @@ sft_config:
   do_eval: True
   lr_scheduler_type: cosine
   max_seq_length: 1280
-  output_dir: outputs
+  output_dir: ../model_outputs
   batch_size: 1
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
