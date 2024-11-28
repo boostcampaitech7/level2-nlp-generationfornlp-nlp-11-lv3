@@ -21,6 +21,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
 │   ├── inference.py
 │   ├── fine_tuning.py
 │   ├── rag.py
+│   ├── vllm_infer.ipynb
 │   └── utils.py
 │        
 ├── README.md
