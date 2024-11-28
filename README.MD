@@ -15,6 +15,8 @@ level2-nlp-generationfornlp-nlp-11-lv3
 │   ├── bm25_retriever
 │   │   └── bm25.bin
 │   └── vectorstore
+│       ├── index.faiss
+│       └── index.pkl
 ├── source                
 │   ├── inference.py
 │   ├── fine_tuning.py
