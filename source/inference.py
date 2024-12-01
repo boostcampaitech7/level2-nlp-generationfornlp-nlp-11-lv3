@@ -1,21 +1,25 @@
 import os
 from ast import literal_eval
 
-import evaluate
+# import evaluate
 import hydra
 import numpy as np
 import pandas as pd
 import torch
-import transformers
+
+# import transformers
 from datasets import Dataset
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+
+# from langchain_community.embeddings import HuggingFaceEmbeddings
+# from langchain_community.vectorstores import FAISS
 from omegaconf import DictConfig
-from peft import AutoPeftModelForCausalLM, LoraConfig
-from rag import init_vectorstore, retrieve_query
+from peft import AutoPeftModelForCausalLM  # LoraConfig
+
+# from rag import init_vectorstore, retrieve_query
 from tqdm import tqdm
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-from trl import DataCollatorForCompletionOnlyLM, SFTConfig, SFTTrainer
+from transformers import AutoModelForCausalLM, AutoTokenizer  # BitsAndBytesConfig
+
+# from trl import DataCollatorForCompletionOnlyLM, SFTConfig, SFTTrainer
 from utils import set_seed
 
 home_path = os.path.expanduser("~")
@@ -211,7 +215,7 @@ def generate_inference(cfg: DictConfig):
     seed = cfg.seed
     data_path = cfg.data_path
     output_path = cfg.output_path
-    from_finetuned = cfg.inference.from_fine_tuning
+    # from_finetuned = cfg.inference.from_fine_tuning
 
     set_seed(seed)  # magic number :)
     output_path = os.path.join(os.path.dirname(__file__), output_path)
@@ -330,7 +334,7 @@ def generate_inference(cfg: DictConfig):
 
     infer_results = []
 
-    pred_choices_map = {0: "1", 1: "2", 2: "3", 3: "4", 4: "5"}
+    # pred_choices_map = {0: "1", 1: "2", 2: "3", 3: "4", 4: "5"}
     model.eval()
     with torch.inference_mode():
         for i, data in enumerate(tqdm(tokenized_dataset, desc="Inferencing")):
@@ -344,9 +348,10 @@ def generate_inference(cfg: DictConfig):
                 max_new_tokens=10,
                 pad_token_id=tokenizer.pad_token_id,
             )
-            generated_text = tokenizer.batch_decode(outputs[:, inputs.input_ids.shape[1] :], skip_special_tokens=True)[
-                0
-            ]
+            generated_text = tokenizer.batch_decode(
+                outputs[:, inputs.input_ids.shape[1] :],  # noqa: E203
+                skip_special_tokens=True,
+            )[0]
             generated_text = generated_text.strip()
             infer_results.append({"id": id, "answer": generated_text})
     model_name = model_id.replace("/", "_")
