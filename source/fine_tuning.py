@@ -144,8 +144,6 @@ def train(cfg):
     )
 
     tokenizer.chat_template = "{% if messages[0]['role'] == 'system' %}{% set system_message = messages[0]['content'] %}{% endif %}{% if system_message is defined %}{{ system_message }}{% endif %}{% for message in messages %}{% set content = message['content'] %}{% if message['role'] == 'user' %}{{ '<start_of_turn>user\n' + content + '<end_of_turn>\n<start_of_turn>model\n' }}{% elif message['role'] == 'assistant' %}{{ content + '<end_of_turn>\n' }}{% endif %}{% endfor %}"  # noqa: E501
-    tokenizer.add_special_tokens({"bos_token": "<start_of_turn>", "eos_token": "<end_of_turn>", "pad_token": "<pad>"})
-    model.resize_token_embeddings(len(tokenizer))
     # peft_config = OmegaConf.to_container(cfg.fine_tuning.get("peft_config"), resolve=True)
     # peft_config = LoraConfig(peft_config)
     peft_config = LoraConfig(
@@ -194,7 +192,9 @@ def train(cfg):
         desc="Tokenizing",
     )
 
-    tokenized_dataset = tokenized_dataset.filter(lambda x: len(x["input_ids"]) <= 1024)
+    is_filter = True
+    if is_filter:
+        tokenized_dataset = tokenized_dataset.filter(lambda x: len(x["input_ids"]) <= 1024)
     tokenized_dataset = tokenized_dataset.train_test_split(test_size=0.1, seed=42)
 
     train_dataset = tokenized_dataset["train"]
