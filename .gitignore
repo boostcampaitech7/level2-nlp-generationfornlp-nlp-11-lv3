@@ -1,0 +1,9 @@
+*.csv
+*.bin
+*.pkl
+*.h5
+/outputs
+/data
+__pycache__
+
+.DS_Store
