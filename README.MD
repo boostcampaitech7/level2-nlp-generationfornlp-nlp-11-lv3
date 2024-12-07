@@ -218,16 +218,10 @@ level2-nlp-generationfornlp-nlp-11-lv3
 | --- | --- | --- |
 | Qwen/Qwen2.5-Coder-32B-Instruct-GPTQ-Int4 | 0.6037 | Logit Inference |
 | Qwen/Qwen2.5-Coder-32B-Instruct-GPTQ-Int4 | 0.7166 | Generation Inference, CoT |
-| Qwen/Qwen2.5-14B-Instruct | 0.7074 | Generation Inference
-1) 지문에서만 답 찾기
-2) 지문에서 답을 못 찾은 문제에 대하여 LLM 지식 이용하여 풀기
-3) GPU Memory 한계로 못 푼 문제는 Qwen/Qwen2.5-7B-Instruct로 풀기 |
-| Qwen/Qwen2.5-14B-Instruct | 0.7097 | Generation Inference
-모든 문제를 LLM의 지식을 이용하여 풀기 |
-| Qwen/Qwen2.5-14B-Instruct | 0.7235 | Logit Inference
- |
-| Qwen/Qwen2.5-7B-Instruct | 0.6152 | Generation Inference
-모든 문제를 LLM의 지식을 이용하여 풀기 |
+| Qwen/Qwen2.5-14B-Instruct | 0.7074 | Generation Inference, 지문에서만 답 찾기, 지문에서 답을 못 찾은 문제에 대하여 LLM 지식 이용하여 풀기, GPU Memory 한계로 못 푼 문제는 Qwen/Qwen2.5-7B-Instruct로 풀기 |
+| Qwen/Qwen2.5-14B-Instruct | 0.7097 | Generation Inference, 모든 문제를 LLM의 지식을 이용하여 풀기 |
+| Qwen/Qwen2.5-14B-Instruct | 0.7235 | Logit Inference |
+| Qwen/Qwen2.5-7B-Instruct | 0.6152 | Generation Inference, 모든 문제를 LLM의 지식을 이용하여 풀기 |
 | Qwen/Qwen2.5-7B-Instruct | 0.6152 | Logit Inference |
 | google/gemma-2-9b-it | 0.5991 | Logit Inference, CoT |
 | google/gemma-2-9b-it | 0.6037 | SFT, Logit Inference, CoT |
@@ -235,9 +229,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
 | NCSOFT/Llama-VARCO-8B-Instruct | 0.5945 | Logit Inference, RAG |
 | yanolja/EEVE-Korean-Instruct-10.8B-v1.0 | 0.6590 | Logit Inference,CoT |
 | yanolja/EEVE-Korean-Instruct-10.8B-v1.0 | 0.6498 | Logit Inference, One-shot |
-| Saxo/Linkbricks-Horizon-AI-Korean-Mistral-Nemo-sft-dpo-12B | 0.6221 | Generation Inference
-mistralai/Mistral-Nemo-Base-2407을 기반으로 SFT -> DPO Fine-tuning 된 한국어 모델
-모든 문제를 LLM의 지식을 이용하여 풀기 |
+| Saxo/Linkbricks-Horizon-AI-Korean-Mistral-Nemo-sft-dpo-12B | 0.6221 | Generation Inference, mistralai/Mistral-Nemo-Base-2407을 기반으로 SFT -> DPO Fine-tuning 된 한국어 모델, 모든 문제를 LLM의 지식을 이용하여 풀기 |
 | upstage/SOLAR-10.7B-v1.0 | 0.5115 | Logit inference |
 | LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct | 0.5908 | Generation Inference, Baseline Prompt |
 | LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct | 0.6184 | Generation Inference, Advanced Prompt |
