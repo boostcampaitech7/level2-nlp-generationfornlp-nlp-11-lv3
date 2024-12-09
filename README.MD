@@ -88,12 +88,6 @@ level2-nlp-generationfornlp-nlp-11-lv3
 └── requirements.txt
 ```
 
-# ▶️ 프로젝트 실행 방법
-
-```bash
-
-```
-
 # **⚒️** 프로젝트 수행 방법
 
 1. **EDA**
@@ -242,5 +236,5 @@ level2-nlp-generationfornlp-nlp-11-lv3
 # **💥 리더보드 최종 결과**
 
 <p align='center'>
-  <img src='img/result.png' width='700'>
+  <img src='images/result.png' width='700'>
 </p>
