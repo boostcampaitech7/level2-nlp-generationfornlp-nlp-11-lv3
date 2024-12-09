@@ -51,7 +51,7 @@
 
 <div align='center'>
 
-|   |   |역할|
+|이름|프로필|역할|
 |:-:|:-:|:-:|
 |권기태 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/starlike6617)|<img src='images/profile-1.jpeg' width="80"></img>|EDA, 모델 Research, Prompt Engineering(Zero-shot CoT 등), RAG|
 |권유진 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/0618yujin)|<img src='images/profile-2.jpeg' width="80"></img>|EDA, 데이터 필터링 및 전처리, 프롬프트 연구|
