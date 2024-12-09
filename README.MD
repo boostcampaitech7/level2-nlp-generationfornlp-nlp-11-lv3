@@ -51,13 +51,14 @@
 
 <div align='center'>
 
-권기태 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/starlike6617) | <img src='images/profile-1.jpeg' width="80"></img> | EDA, 모델 Research, Prompt Engineering(Zero-shot CoT 등), RAG  
-:-: | :-: | :-:  
-권유진 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/0618yujin) | <img src='images/profile-2.jpeg' width="80"></img> | EDA, 데이터 필터링 및 전처리, 프롬프트 연구  
-박무재 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Mujae) | <img src='images/profile-3.jpeg' width="80"></img> | EDA, 프롬프트(CoT, 감정 호소, pythonic, XML), Trying Advanced RAG  
-박정미 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/imJeongmi) | <img src='images/profile-4.jpeg' width="80"></img> | EDA, 모델 Research, 프롬프트 연구 및 실험  
-이용준 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/elwhyjay) | <img src='images/profile-5.jpeg' width="80"></img> | PM, 모듈화, RAG pipeline 구현, Fine–tuning, 모델 Research, prompting(one-shot etc..)  
-정원식 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/wonsjeong) | <img src='images/profile-6.jpeg' width="80"></img> | EDA, 모델 Research, 시험지 형식 및 레이블링 툴 구현, 모델 실험 Pipeline 구현, Fine-tuning  
+|   |   |역할|
+|:-:|:-:|:-:|
+|권기태 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/starlike6617)|<img src='images/profile-1.jpeg' width="80"></img>|EDA, 모델 Research, Prompt Engineering(Zero-shot CoT 등), RAG|
+|권유진 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/0618yujin)|<img src='images/profile-2.jpeg' width="80"></img>|EDA, 데이터 필터링 및 전처리, 프롬프트 연구|
+|박무재 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Mujae)|<img src='images/profile-3.jpeg' width="80"></img>|EDA, 프롬프트(CoT, 감정 호소, pythonic, XML), Trying Advanced RAG|
+|박정미 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/imJeongmi)|<img src='images/profile-4.jpeg' width="80"></img>|EDA, 모델 Research, 프롬프트 연구 및 실험|
+|이용준 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/elwhyjay)|<img src='images/profile-5.jpeg' width="80"></img>|PM, 모듈화, RAG pipeline 구현, Fine–tuning, 모델 Research, prompting(one-shot etc..)|
+|정원식 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/wonsjeong)|<img src='images/profile-6.jpeg' width="80"></img>|EDA, 모델 Research, 시험지 형식 및 레이블링 툴 구현, 모델 실험 Pipeline 구현, Fine-tuning|
 
 </div>
 <br>
