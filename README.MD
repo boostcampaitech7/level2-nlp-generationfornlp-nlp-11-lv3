@@ -45,20 +45,18 @@
 ### **평가 방법**
 
 - **정확도(Accuracy)** = 모델이 맞춘 문제 수 / 전체 문제 수
+<br>
 
 # **👨🏻‍💻 팀원 소개 및 역할**
 
-**권기태** |  EDA, 모델 Research, Prompt Engineering(Zero-shot CoT 등), RAG
+<div align='center'>
+|권기태 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/starlike6617)  
+|권유진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/0618yujin)|박무재 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Mujae)|박정미 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/imJeongmi)|이용준 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/elwhyjay)|정원식 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/wonsjeong)|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|<img src='img/profile-1.jpeg' width="80"></img>|<img src='img/profile-2.jpeg' width="80"></img>|<img src='img/profile-3.jpeg' width="80"></img>|<img src='img/profile-4.jpeg' width="80"></img>|<img src='img/profile-5.jpeg' width="80"></img>|<img src='img/profile-6.jpeg' width="80"></img>|
+|<div width="150">EDA, 모델 Research, Prompt Engineering(Zero-shot CoT 등), RAG</div>|<div width="150">EDA, 데이터 필터링 및 전처리, 프롬프트 연구</div>|<div width="150">EDA, 프롬프트(CoT, 감정 호소, pythonic, XML), Trying Advanced RAG</div>|<div width="150">EDA, 프롬프트 연구 및 실험</div>|<div width="150">PM, 모듈화, RAG pipeline 구현, Fine–tuning, 모델 Research, prompting(one-shot etc..)</div>|<div width="150">EDA, 모델 Research, 시험지 형식 및 레이블링 툴 구현, 모델 실험 Pipeline 구현, Fine-tuning</div>|
 
-**권유진** |  EDA, 데이터 필터링 및 전처리, 프롬프트 연구
-
-**박무재** |  EDA, 프롬프트(CoT, 감정 호소, pythonic, XML), Trying Advanced RAG
-
-**박정미** |  EDA, 프롬프트 연구 및 실험
-
-**이용준** |  PM, 모듈화, RAG pipeline 구현, Fine–tuning, 모델 Research, prompting(one-shot etc..)
-
-**정원식** |  EDA, 모델 Research, 시험지 형식 및 레이블링 툴 구현, 모델 실험 Pipeline 구현, Fine-tuning
+</div> <br>
 
 # 🦴 **프로젝트 구조**
 
@@ -87,6 +85,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
 ├── inference.sh
 └── requirements.txt
 ```
+<br>
 
 # **⚒️** 프로젝트 수행 방법
 
@@ -210,6 +209,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
     |  | Logit | Generation |
     | --- | --- | --- |
     | **Test Accuracy** | 0.7235 | 0.7097 |
+<br>
 
 # **💥 결과**
 
@@ -233,7 +233,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
 | LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct | 0.5908 | Generation Inference, Baseline Prompt |
 | LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct | 0.6184 | Generation Inference, Advanced Prompt |
 
-# **💥 리더보드 최종 결과**
+### **💥 리더보드 최종 결과**
 
 <p align='center'>
   <img src='images/result.png' width='700'>
