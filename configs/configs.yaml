@@ -1,0 +1,8 @@
+seed: 42
+data_path: ../data
+output_path: ../outputs
+model_path: ../model_outputs
+model: Qwen/Qwen2.5-Coder-32B-Instruct-GPTQ-Int4
+defaults:
+  - inference: inference
+  - fine_tuning: fine_tuning
