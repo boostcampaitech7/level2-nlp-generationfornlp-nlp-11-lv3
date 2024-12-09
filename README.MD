@@ -54,7 +54,8 @@
 |권기태 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/starlike6617)|권유진 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/0618yujin)|박무재 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Mujae)|박정미 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/imJeongmi)|이용준 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/elwhyjay)|정원식 [<img src="images/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/wonsjeong)|
 |:-:|:-:|:-:|:-:|:-:|:-:|
 |<img src='images/profile-1.jpeg' width="80"></img>|<img src='images/profile-2.jpeg' width="80"></img>|<img src='images/profile-3.jpeg' width="80"></img>|<img src='images/profile-4.jpeg' width="80"></img>|<img src='images/profile-5.jpeg' width="80"></img>|<img src='images/profile-6.jpeg' width="80"></img>|
-|<div width="150">EDA, 모델 Research, Prompt Engineering(Zero-shot CoT 등), RAG</div>|<div width="150">EDA, 데이터 필터링 및 전처리, 프롬프트 연구</div>|<div width="150">EDA, 프롬프트(CoT, 감정 호소, pythonic, XML), Trying Advanced RAG</div>|<div width="150">EDA, 프롬프트 연구 및 실험</div>|<div width="150">PM, 모듈화, RAG pipeline 구현, Fine–tuning, 모델 Research, prompting(one-shot etc..)</div>|<div width="150">EDA, 모델 Research, 시험지 형식 및 레이블링 툴 구현, 모델 실험 Pipeline 구현, Fine-tuning</div>|
+
+|<div width="150">EDA, 모델 Research, Prompt Engineering(Zero-shot CoT 등), RAG                    </div>|<div width="150">EDA, 데이터 필터링 및 전처리, 프롬프트 연구                                             </div>|<div width="150">EDA, 프롬프트(CoT, 감정 호소, pythonic, XML), Trying Advanced RAG                   </div>|<div width="150">EDA, 모델 Research, 프롬프트 연구 및 실험                                             </div>|<div width="150">PM, 모듈화, RAG pipeline 구현, Fine–tuning, 모델 Research, prompting(one-shot etc..)</div>|<div width="150">EDA, 모델 Research, 시험지 형식 및 레이블링 툴 구현, 모델 실험 Pipeline 구현, Fine-tuning   </div>|
 </div> 
 <br>
 
@@ -125,7 +126,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
                 : **정답** 저품질(정답 오류, 복수 정답, 정답 없음) 데이터 수정
         2. 정답 선지 분포 조정
             <p align='center'>
-                <img src='images/image-2.png' width='500'>
+                <img src='images/image-2.png' width='400'>
             </p>
             
             - 5지선다 중 정답이 ‘**1**’에 편중된 경향 확인
@@ -148,7 +149,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
     - RAG Pipeline
         
         <p align='center'>
-            <img src='images/image-3.png' width='700'>
+            <img src='images/image-3.png' width='550'>
         </p>
         
     - Retrieval 예시
@@ -198,17 +199,6 @@ level2-nlp-generationfornlp-nlp-11-lv3
             ```
             {지문} {질문} {선택지} {풀이} {정답} 순으로 예시를 base prompt 전위에 삽입.
             ```
-            
-
-### **실험 결과**
-
-1. **Inference**
-    
-    비교는 Qwen2.5-14B-Instruct를 기준으로 한다.
-    
-    |  | Logit | Generation |
-    | --- | --- | --- |
-    | **Test Accuracy** | 0.7235 | 0.7097 |
 <br>
 
 # **💥 결과**
@@ -233,7 +223,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
 | LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct | 0.5908 | Generation Inference, Baseline Prompt |
 | LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct | 0.6184 | Generation Inference, Advanced Prompt |
 
-### **💥 리더보드 최종 결과**
+### **리더보드 최종 결과**
 
 <p align='center'>
   <img src='images/result.png' width='700'>
