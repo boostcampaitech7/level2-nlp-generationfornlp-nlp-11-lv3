@@ -31,9 +31,9 @@
     | **id** | 데이터 고유 식별자 |
     | **paragraph** | 지문 |
     | **problems** | 문제 관련 정보 |
-    | **ㄴ** **question** | 문제 질문 |
-    | **ㄴ choices** | 선지 |
-    | **ㄴ answer** | 정답 |
+    | ㄴ **question** | 문제 질문 |
+    | ㄴ **choices** | 선지 |
+    | ㄴ **answer** | 정답 |
     | **question_plus** | 보기 |
 3. **총 데이터 개수**
     
@@ -97,7 +97,7 @@ level2-nlp-generationfornlp-nlp-11-lv3
 # **⚒️** 프로젝트 수행 방법
 
 1. **EDA**
-    1. 학습 데이터셋 수동 레이블링
+    1. **학습 데이터셋 수동 레이블링**
         1. 필요 지식
             
             : paragraph에 포함된 정보만으로 문제를 해결할 수 있는지 여부를 판단
@@ -105,7 +105,9 @@ level2-nlp-generationfornlp-nlp-11-lv3
             - paragraph 외의 배경지식이나 추가 정보가 필요한 문제 (RAG 사용)
             - paragraph 내 정보만으로 풀 수 있는 문제 (RAG 미사용)
                 
-                ![image.png](Github%20Readme%2013b04685f59381e5b3aecb904af4d794/614a33e4-c70b-4c29-acff-be47f527a8be.png)
+            <p align='center'>
+                <img src='images/image-1.png' width='400'>
+            </p>
                 
         2. 데이터 품질 점검
             
@@ -121,19 +123,20 @@ level2-nlp-generationfornlp-nlp-11-lv3
     2. **전처리**
         1. 데이터 필터링
             
-            1) 저품질 데이터 제거
+            - 저품질 데이터 제거
             
-            - **지문** 저품질(지문의 내용 부실 및 이상, 문제 & 선택지 간의 연계 부족), **문제** 저품질(문제 내용 부실 및 이상), **선택지** 저품질(문제와의 연계 부족) 데이터 제거
+                : **지문** 저품질(지문의 내용 부실 및 이상, 문제 & 선택지 간의 연계 부족), **문제** 저품질(문제 내용 부실 및 이상), **선택지** 저품질(문제와의 연계 부족) 데이터 제거
             
-            2) 저품질 데이터 수정
+            - 저품질 데이터 수정
             
-            - **정답** 저품질(정답 오류, 복수 정답, 정답 없음) 데이터 수정
+                : **정답** 저품질(정답 오류, 복수 정답, 정답 없음) 데이터 수정
         2. 정답 선지 분포 조정
-            
-            [https://lh7-rt.googleusercontent.com/docsz/AD_4nXe8ej7jO4QNyEoT5KkCkfFsGGno6lVVdjivPF5DnaOhm0nH1a4lUePeNhPXDNNXV2nR28r2AFUBBxWrfj487O7AU9QmqUHNiH5pIxh5EFKJP000A8m4iX__JFfQ-GubfzDolOVzHw?key=Lxa_cCAl--HUQMcMnxyU8h3g](https://lh7-rt.googleusercontent.com/docsz/AD_4nXe8ej7jO4QNyEoT5KkCkfFsGGno6lVVdjivPF5DnaOhm0nH1a4lUePeNhPXDNNXV2nR28r2AFUBBxWrfj487O7AU9QmqUHNiH5pIxh5EFKJP000A8m4iX__JFfQ-GubfzDolOVzHw?key=Lxa_cCAl--HUQMcMnxyU8h3g)
+            <p align='center'>
+                <img src='images/image-2.png' width='500'>
+            </p>
             
             - 5지선다 중 정답이 ‘**1**’에 편중된 경향 확인
-                - 4지선다 문제에 ‘정답 아님’ 선택지를 추가해 5지선다로 변경한 후, 정답이 1부터 5까지 고르게 분포하도록 randomint를 통해 데이터를 조정
+                : 4지선다 문제에 ‘정답 아님’ 선택지를 추가해 5지선다로 변경한 후, 정답이 1부터 5까지 고르게 분포하도록 randomint를 통해 데이터를 조정
     3. **데이터 버전**
         
         
@@ -151,7 +154,9 @@ level2-nlp-generationfornlp-nlp-11-lv3
 3. **RAG**
     - RAG Pipeline
         
-        [https://lh7-rt.googleusercontent.com/docsz/AD_4nXd2lO9_Ryb18z5Avqxd75aJkaKOggI5ICTpYRuLLn-jlKo9lQVxpGB_CMPN2vttPoqZH_qveTonku81zFoFocGndSWMppio6fF6Pc-Efj2TbcghGdeLgWVRZjjQccvk3FFgFDiN?key=Lxa_cCAl--HUQMcMnxyU8h3g](https://lh7-rt.googleusercontent.com/docsz/AD_4nXd2lO9_Ryb18z5Avqxd75aJkaKOggI5ICTpYRuLLn-jlKo9lQVxpGB_CMPN2vttPoqZH_qveTonku81zFoFocGndSWMppio6fF6Pc-Efj2TbcghGdeLgWVRZjjQccvk3FFgFDiN?key=Lxa_cCAl--HUQMcMnxyU8h3g)
+        <p align='center'>
+            <img src='images/image-3.png' width='700'>
+        </p>
         
     - Retrieval 예시
         
@@ -236,4 +241,6 @@ level2-nlp-generationfornlp-nlp-11-lv3
 
 # **💥 리더보드 최종 결과**
 
-[https://lh7-rt.googleusercontent.com/docsz/AD_4nXdmW8LI7OC7eJ3_QlNlflR24Gv0c_b8wdUHzPnNB8B6MKBKCNScWYpQuVHWYu74jW6oQAHuKTT1Rqu-DHi7NfsmgrQIbTx67zdN_o-ks6qv3uVvoL75e98pGChbQuW943JDeVDVyQ?key=Lxa_cCAl--HUQMcMnxyU8h3g](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdmW8LI7OC7eJ3_QlNlflR24Gv0c_b8wdUHzPnNB8B6MKBKCNScWYpQuVHWYu74jW6oQAHuKTT1Rqu-DHi7NfsmgrQIbTx67zdN_o-ks6qv3uVvoL75e98pGChbQuW943JDeVDVyQ?key=Lxa_cCAl--HUQMcMnxyU8h3g)
+<p align='center'>
+  <img src='img/result.png' width='700'>
+</p>
