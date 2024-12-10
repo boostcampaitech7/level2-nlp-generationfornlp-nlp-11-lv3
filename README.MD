@@ -92,7 +92,15 @@ level2-nlp-generationfornlp-nlp-11-lv3
 ```
 <br> 
 
-# 프로젝트 실행방법
+# **▶️** 프로젝트 실행 방법
+'''bash
+#inference
+./inference.py
+
+#fine-tuning
+./fine-tuning.py
+'''
+<br>
 
 # **⚒️** 프로젝트 수행 방법
 
