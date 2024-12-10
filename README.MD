@@ -90,7 +90,9 @@ level2-nlp-generationfornlp-nlp-11-lv3
 ├── inference.sh
 └── requirements.txt
 ```
-<br>
+<br> 
+
+# 프로젝트 실행방법
 
 # **⚒️** 프로젝트 수행 방법
 
